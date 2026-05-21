@@ -4,17 +4,26 @@ const Admin = require('../models/Admin');
 const protectAdmin = async (req, res, next) => {
   let token;
 
-  // Extract the token parameter straight out of the secure cookie storage layer
-  if (req.cookies && req.cookies.admin_token) {
-    token = req.cookies.admin_token;
+  // 1. Look for the token in the HTTP Authorization header matrix
+  if (
+    req.headers.authorization && 
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    try {
+      // Split the "Bearer" string away from the token parameter payload
+      token = req.headers.authorization.split(' ')[1];
+    } catch (err) {
+      return res.status(401).json({ message: 'Malformed authorization header structure.' });
+    }
   }
 
+  // 2. Reject request if no authorization token log is present
   if (!token) {
     return res.status(401).json({ message: 'Access Denied. No operational token logs found.' });
   }
 
   try {
-    // Decrypt and validate token payload structure
+    // Decrypt and validate token payload structure using server secret signature
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Attach admin context back to operational route thread (excluding passcode hash)
