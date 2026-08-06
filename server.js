@@ -21,7 +21,7 @@ app.use(cookieParser());
 
 // Security Configurations
 app.use(cors({
-  origin: 'https://nova-seven-henna.vercel.app', // Your Vite React Frontend URI development origin
+  origin: 'https://nova-disconfig.vercel.app',
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' })); 
