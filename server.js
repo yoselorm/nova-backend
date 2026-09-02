@@ -8,6 +8,7 @@ const appointmentRouter = require('./routes/appointmentRoutes');
 const blogRouter = require('./routes/blogRoutes');
 const jobRouter = require('./routes/jobRoutes');
 const applicationRouter = require('./routes/applicationRoutes');
+const contactRouter = require('./routes/contactRoutes');
 
 
 
@@ -34,6 +35,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/blogs',blogRouter); // Blog routes for public and admin channels
 app.use('/api/jobs', jobRouter); // Careers job postings + public application intake
 app.use('/api/applications', applicationRouter); // Admin-only applicant registry management
+app.use('/api/contact', contactRouter); // Public contact form submissions
 
 // Server Telemetry Log Monitor
 const PORT = process.env.PORT || 4000;
