@@ -1,5 +1,7 @@
 const Appointment = require('../models/Appointment');
 
+// Clinic only accepts appointments on Monday (1), Wednesday (3), and Friday (5)
+const ALLOWED_APPOINTMENT_DAYS = [1, 3, 5];
 
 const createAppointment = async (req, res) => {
   try {
@@ -8,6 +10,11 @@ const createAppointment = async (req, res) => {
     // Fast fail guard
     if (!subsidiary || !date || !timeSlot || !fullName || !email || !phone) {
       return res.status(400).json({ message: 'Missing required validation data parameters.' });
+    }
+
+    const requestedDay = new Date(date).getUTCDay();
+    if (!ALLOWED_APPOINTMENT_DAYS.includes(requestedDay)) {
+      return res.status(400).json({ message: 'Appointments are only available on Monday, Wednesday, and Friday.' });
     }
 
     const appointment = await Appointment.create({

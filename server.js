@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser');
 const authRouter = require('./routes/authRoutes');
 const appointmentRouter = require('./routes/appointmentRoutes');
 const blogRouter = require('./routes/blogRoutes');
+const jobRouter = require('./routes/jobRoutes');
+const applicationRouter = require('./routes/applicationRoutes');
 
 
 
@@ -24,12 +26,14 @@ app.use(cors({
   origin: 'https://nova-disconfig.vercel.app',
   credentials: true
 }));
-app.use(express.json({ limit: '10mb' })); 
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(express.json({ limit: '12mb' }));
+app.use(express.urlencoded({ limit: '12mb', extended: true }));
 // Mounting API Array Route Branches
 app.use('/api/appointments',appointmentRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/blogs',blogRouter); // Blog routes for public and admin channels
+app.use('/api/jobs', jobRouter); // Careers job postings + public application intake
+app.use('/api/applications', applicationRouter); // Admin-only applicant registry management
 
 // Server Telemetry Log Monitor
 const PORT = process.env.PORT || 4000;
