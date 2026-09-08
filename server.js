@@ -24,7 +24,11 @@ app.use(cookieParser());
 
 // Security Configurations
 app.use(cors({
-  origin: 'https://nova-disconfig.vercel.app',
+  origin: [
+    'https://nova-disconfig.vercel.app',
+    'https://novahealthcareghana.com',
+    'https://www.novahealthcareghana.com'
+  ],
   credentials: true
 }));
 app.use(express.json({ limit: '12mb' }));
