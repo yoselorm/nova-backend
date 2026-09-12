@@ -4,7 +4,7 @@ const AppointmentSchema = new mongoose.Schema({
   subsidiary: {
     type: String,
     required: [true, 'Subsidiary routing field is mandatory'],
-    enum: ['surgery', 'fertility', 'pharmacy']
+    enum: ['surgery', 'fertility', 'pharmacy', 'wellness', 'gynecology']
   },
   date: {
     type: Date,
@@ -12,7 +12,7 @@ const AppointmentSchema = new mongoose.Schema({
   },
   timeSlot: {
     type: String,
-    required: [true, 'Target time slot window is mandatory']
+    default: ''
   },
   fullName: {
     type: String,

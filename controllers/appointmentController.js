@@ -8,7 +8,7 @@ const createAppointment = async (req, res) => {
     const { subsidiary, date, timeSlot, fullName, email, phone, notes } = req.body;
 
     // Fast fail guard
-    if (!subsidiary || !date || !timeSlot || !fullName || !email || !phone) {
+    if (!subsidiary || !date || !fullName || !email || !phone) {
       return res.status(400).json({ message: 'Missing required validation data parameters.' });
     }
 
