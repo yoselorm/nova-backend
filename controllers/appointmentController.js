@@ -45,19 +45,33 @@ const getAllAppointments = async (req, res) => {
   }
 };
 
-// @desc    Update appointment status (Admin Controlled)
+// @desc    Update an appointment's status and/or time slot (Admin Controlled)
+//          The public booking form no longer collects a time — the hospital
+//          assigns it here once the request comes in.
 // @route   PUT /api/appointments/:id
-const updateAppointmentStatus = async (req, res) => {
+const updateAppointment = async (req, res) => {
   try {
-    const { status } = req.body;
-    
-    if (!['pending', 'confirmed', 'cancelled'].includes(status)) {
-      return res.status(400).json({ message: 'Invalid operational status parameter.' });
+    const { status, timeSlot } = req.body;
+    const updates = {};
+
+    if (status !== undefined) {
+      if (!['pending', 'confirmed', 'cancelled'].includes(status)) {
+        return res.status(400).json({ message: 'Invalid operational status parameter.' });
+      }
+      updates.status = status;
+    }
+
+    if (timeSlot !== undefined) {
+      updates.timeSlot = timeSlot;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: 'Nothing to update.' });
     }
 
     const appointment = await Appointment.findByIdAndUpdate(
       req.params.id,
-      { status },
+      updates,
       { new: true, runValidators: true }
     );
 
@@ -74,5 +88,5 @@ const updateAppointmentStatus = async (req, res) => {
 module.exports = {
   createAppointment,
   getAllAppointments,
-  updateAppointmentStatus
+  updateAppointment
 };
