@@ -1,7 +1,7 @@
 const Appointment = require('../models/Appointment');
 
-// Clinic only accepts appointments on Monday (1), Wednesday (3), and Friday (5)
-const ALLOWED_APPOINTMENT_DAYS = [1, 3, 5];
+// Clinic accepts booked appointments Monday (1) through Friday (5); walk-ins are welcome every day
+const ALLOWED_APPOINTMENT_DAYS = [1, 2, 3, 4, 5];
 
 const createAppointment = async (req, res) => {
   try {
@@ -14,7 +14,7 @@ const createAppointment = async (req, res) => {
 
     const requestedDay = new Date(date).getUTCDay();
     if (!ALLOWED_APPOINTMENT_DAYS.includes(requestedDay)) {
-      return res.status(400).json({ message: 'Appointments are only available on Monday, Wednesday, and Friday.' });
+      return res.status(400).json({ message: 'Appointments are only available Monday through Friday.' });
     }
 
     const appointment = await Appointment.create({
