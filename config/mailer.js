@@ -20,4 +20,12 @@ const getTransporter = () => {
   return transporter;
 };
 
-module.exports = { getTransporter };
+// Visitor-typed text is dropped into email HTML, so neutralise any markup first
+const escapeHtml = (value) => String(value ?? '')
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
+module.exports = { getTransporter, escapeHtml };

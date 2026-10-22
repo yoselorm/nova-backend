@@ -1,7 +1,40 @@
 const Appointment = require('../models/Appointment');
+const { getTransporter, escapeHtml } = require('../config/mailer');
 
 // Clinic accepts booked appointments Monday (1) through Friday (5); walk-ins are welcome every day
 const ALLOWED_APPOINTMENT_DAYS = [1, 2, 3, 4, 5];
+
+// Lets the front desk see new bookings in the shared inbox without opening the admin panel
+const notifyClinicOfAppointment = async (appointment) => {
+  const receiver = process.env.CONTACT_RECEIVER_EMAIL;
+  if (!receiver) return;
+
+  const preferredDate = new Date(appointment.date).toDateString();
+  const rows = [
+    ['Tracking ID', appointment.trackingId],
+    ['Name', appointment.fullName],
+    ['Email', appointment.email],
+    ['Phone', appointment.phone],
+    ['Service', appointment.subsidiary],
+    ['Preferred date', preferredDate],
+    ['Notes', appointment.notes || 'None']
+  ];
+
+  await getTransporter().sendMail({
+    from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+    to: receiver,
+    replyTo: appointment.email,
+    subject: `[Nova Booking] ${appointment.fullName} — ${appointment.subsidiary}, ${preferredDate}`,
+    text: rows.map(([label, value]) => `${label}: ${value}`).join('\n'),
+    html: `
+      <p>A new appointment request was submitted on the website.</p>
+      <table cellpadding="6" style="border-collapse:collapse">
+        ${rows.map(([label, value]) => `<tr><td><strong>${label}</strong></td><td>${escapeHtml(value).replace(/\n/g, '<br/>')}</td></tr>`).join('')}
+      </table>
+      <p>Assign a time slot and confirm it from the admin panel.</p>
+    `
+  });
+};
 
 const createAppointment = async (req, res) => {
   try {
@@ -26,6 +59,13 @@ const createAppointment = async (req, res) => {
       phone,
       notes
     });
+
+    // The booking is already saved, so a mail outage shouldn't turn it into an error for the patient
+    try {
+      await notifyClinicOfAppointment(appointment);
+    } catch (mailError) {
+      console.error('Appointment email notification failed:', mailError.message);
+    }
 
     res.status(201).json({ success: true, data: appointment });
   } catch (error) {

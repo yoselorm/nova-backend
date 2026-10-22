@@ -1,4 +1,4 @@
-const { getTransporter } = require('../config/mailer');
+const { getTransporter, escapeHtml } = require('../config/mailer');
 
 // @desc    Send a message from the public contact form to the clinic's inbox
 // @route   POST /api/contact
@@ -22,9 +22,9 @@ const sendContactMessage = async (req, res) => {
       subject: `[Nova Website] ${subject || 'New contact form message'}`,
       text: `From: ${fullName} <${email}>\n\n${message}`,
       html: `
-        <p><strong>From:</strong> ${fullName} (${email})</p>
-        <p><strong>Subject:</strong> ${subject || 'New contact form message'}</p>
-        <p>${String(message).replace(/\n/g, '<br/>')}</p>
+        <p><strong>From:</strong> ${escapeHtml(fullName)} (${escapeHtml(email)})</p>
+        <p><strong>Subject:</strong> ${escapeHtml(subject || 'New contact form message')}</p>
+        <p>${escapeHtml(message).replace(/\n/g, '<br/>')}</p>
       `
     });
 
