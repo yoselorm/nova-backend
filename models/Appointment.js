@@ -30,6 +30,21 @@ const AppointmentSchema = new mongoose.Schema({
     required: [true, 'Contact phone matrix string is mandatory'],
     trim: true
   },
+  // Older bookings predate these patient-profile fields, so they're enforced in the controller instead of here
+  dateOfBirth: {
+    type: Date
+  },
+  address: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  patientStatus: {
+    type: String,
+    enum: ['new', 'existing', ''],
+    default: ''
+  },
+  // Shown to patients and staff as "Reason for appointment"
   notes: {
     type: String,
     default: ''
