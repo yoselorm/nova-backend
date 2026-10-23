@@ -88,7 +88,7 @@ const createAppointment = async (req, res) => {
     const { subsidiary, date, timeSlot, fullName, email, phone, dateOfBirth, address, patientStatus, notes } = req.body;
 
     // Fast fail guard
-    if (!subsidiary || !date || !fullName || !email || !phone || !dateOfBirth || !address || !notes) {
+    if (!subsidiary || !date || !timeSlot || !fullName || !email || !phone || !dateOfBirth || !address || !notes) {
       return res.status(400).json({ message: 'Missing required validation data parameters.' });
     }
 
@@ -140,8 +140,8 @@ const getAllAppointments = async (req, res) => {
 };
 
 // @desc    Update an appointment's status and/or time slot (Admin Controlled)
-//          The public booking form no longer collects a time — the hospital
-//          assigns it here once the request comes in.
+//          Patients choose a preferred time when booking; the hospital can
+//          move it to another slot here.
 // @route   PUT /api/appointments/:id
 const updateAppointment = async (req, res) => {
   try {
