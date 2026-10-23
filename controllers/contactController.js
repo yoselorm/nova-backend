@@ -1,4 +1,4 @@
-const { getTransporter, escapeHtml } = require('../config/mailer');
+const { sendMail, escapeHtml } = require('../config/mailer');
 
 // @desc    Send a message from the public contact form to the clinic's inbox
 // @route   POST /api/contact
@@ -15,7 +15,7 @@ const sendContactMessage = async (req, res) => {
       return res.status(500).json({ message: 'Contact inbox is not configured yet. Please try again later.' });
     }
 
-    await getTransporter().sendMail({
+    await sendMail('Contact form', {
       from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
       to: receiver,
       replyTo: email,

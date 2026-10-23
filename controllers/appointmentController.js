@@ -1,5 +1,5 @@
 const Appointment = require('../models/Appointment');
-const { getTransporter, escapeHtml } = require('../config/mailer');
+const { sendMail, escapeHtml } = require('../config/mailer');
 
 // Clinic accepts booked appointments Monday (1) through Friday (5); walk-ins are welcome every day
 const ALLOWED_APPOINTMENT_DAYS = [1, 2, 3, 4, 5];
@@ -26,7 +26,10 @@ const formatDate = (value) => new Date(value).toLocaleDateString('en-US', {
 // Field order and card layout follow the format the clinic staff asked for.
 const notifyClinicOfAppointment = async (appointment) => {
   const receiver = process.env.CONTACT_RECEIVER_EMAIL;
-  if (!receiver) return;
+  if (!receiver) {
+    console.warn('[MAIL] Booking: CONTACT_RECEIVER_EMAIL is not set, skipping notification email');
+    return;
+  }
 
   const service = SERVICE_LABELS[appointment.subsidiary] || appointment.subsidiary;
   const preferredDate = formatDate(appointment.date);
@@ -58,7 +61,7 @@ const notifyClinicOfAppointment = async (appointment) => {
       </td></tr>`;
   }).join('');
 
-  await getTransporter().sendMail({
+  await sendMail('Booking', {
     from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
     to: receiver,
     replyTo: appointment.email,
@@ -118,7 +121,8 @@ const createAppointment = async (req, res) => {
     try {
       await notifyClinicOfAppointment(appointment);
     } catch (mailError) {
-      console.error('Appointment email notification failed:', mailError.message);
+      // Details are already logged by sendMail; note that the booking itself still went through
+      console.error(`[MAIL] Booking: notification for ${appointment.trackingId} not sent, booking was still saved`);
     }
 
     res.status(201).json({ success: true, data: appointment });
